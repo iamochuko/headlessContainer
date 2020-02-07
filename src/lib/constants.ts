@@ -8,6 +8,5 @@ export enum Config {
 }
 
 export const JWT_OPTIONS = {
-  //secret: process.env.JWT_OPTION_SECRETE || 'iusecrete2010',
-  secret: 'iusecrete2010',
+  secret: process.env.JWT_OPTION_SECRETE || 'secret101Key',
 };
