@@ -1,12 +1,48 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+  HttpException,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
 import { AppService } from './app.service';
+import { AuthService } from './auth/auth.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  // @UseGuards - This Guard uses the Passport-local strategy and kicks off the
+  // steps of retrieving credentials, running the verify function, creating the user property, etc.
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Request() req) {
+    try {
+      const res = await this.authService.login(req.user);
+      return res;
+    } catch (err) {
+      throw new HttpException('Bad Response', 302);
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  async profile(@Request() req: any) {
+    try {
+      return req.user || ' profile anem';
+    } catch (error) {
+      throw new HttpException('Bad Response', 302);
+    }
   }
 }

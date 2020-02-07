@@ -1,19 +1,20 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { cors } from 'cors';
-import { helmet } from 'helmet';
-
+import * as cors from 'cors';
+import * as helmet from 'helmet';
 import { Request, Response } from 'express';
+
+import { AppModule } from './app.module';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.use(cors());
-  // app.use(helmet());
+  app.use(cors());
+  app.use(helmet());
   //app.useGlobalPipes(new ValidationPipe()); // global scope validation
   app.use((req: Request, res: Response, next: Function) => {
     console.log('%s', req);
     next();
   });
-  await app.listen(3000);
+  await app.listen(5000);
 }
 bootstrap();
