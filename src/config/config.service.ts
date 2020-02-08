@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import path = require('path');
 
 import { IEnvConfig } from '../interface';
-import { Config } from '../lib/constants';
+import { CONFIG } from '../lib/constants';
 
 @Injectable()
 export class ConfigService {
@@ -12,8 +12,8 @@ export class ConfigService {
 
   // Recall: when we define a provider in @Module using a
   // non-class token we need to use the @Inject() for DI
-
-  constructor(@Inject(Config.CONFIG_OPTIONS) private options) {
+  constructor(@Inject(CONFIG.CONFIG_OPTIONS) private readonly options) {
+    console.log('[ConfigService] - options: ', options);
     const filePath = `${process.env.NODE_ENV || 'development'}.env`;
     this.envConfig = dotenv.parse(
       fs.readFileSync(
@@ -23,6 +23,7 @@ export class ConfigService {
   }
 
   get(key: string): string {
+    console.log('[ConfigService from Pre-Hook] - key:', key)
     return this.envConfig[key];
   }
 }

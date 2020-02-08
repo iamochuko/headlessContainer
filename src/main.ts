@@ -4,10 +4,12 @@ import * as helmet from 'helmet';
 import { Request, Response } from 'express';
 
 import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  require('dotenv').config({ debug: process.env.DOTENV_DEBUG });
+  const configService = app.get(ConfigService)
+  //require('dotenv').config({ debug: process.env.DOTENV_DEBUG });
 
   app.use(cors());
   app.use(helmet());
@@ -16,6 +18,6 @@ async function bootstrap() {
     //console.log('%s', req);
     next();
   });
-  await app.listen(5000);
+  await app.listen(5000 || configService.get('PORT'));
 }
 bootstrap();

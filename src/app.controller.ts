@@ -5,13 +5,14 @@ import {
   Request,
   UseGuards,
   HttpException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 
-@Controller()
+@Controller('api')
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -30,7 +31,7 @@ export class AppController {
   async login(@Request() req) {
     try {
       const res = await this.authService.login(req.user);
-      return res;
+      return res ? res : { err: 'Not Authorised!' };
     } catch (err) {
       throw new HttpException('Bad Response', 302);
     }
@@ -40,7 +41,10 @@ export class AppController {
   @Get('profile')
   async profile(@Request() req: any) {
     try {
-      return req.user || ' profile anem';
+      if (req.user) {
+        return req.user;
+      }
+      throw new ForbiddenException();
     } catch (error) {
       throw new HttpException('Bad Response', 302);
     }

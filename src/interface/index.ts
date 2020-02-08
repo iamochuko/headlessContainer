@@ -6,5 +6,5 @@ export interface ICat{
 
 
 export interface IEnvConfig{
-    
+   // name:string
 }

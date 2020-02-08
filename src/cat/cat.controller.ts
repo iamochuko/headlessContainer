@@ -12,20 +12,20 @@ import {
   ParseIntPipe,
   UseGuards,
   UseInterceptors,
+  Paramtype,
 } from '@nestjs/common';
 
-import { CreateCat, UpdateCat } from '../model/Cat';
 import { UserModel } from '../model/User';
-import { ICat } from '../interface';
 import { CatService } from './cat.service';
 import { HttpExceptionFilter } from '../Exception/http-exception-filter';
 import { ValidationPipe } from '../pipe/validation.pipe';
 import { RolesGuard } from '../guard/roles.guard';
 import { Roles } from '../decorator/roles.decorator';
 import { LoggingInterceptor } from '../interceptor/logging.interceptor';
-import { User } from 'src/decorator/user.decorator';
+import { User } from '../decorator/user.decorator';
+import { CreateCat, UpdateCat } from '../cat/model/cat';
 
-@Controller('cats')
+@Controller('api/cats')
 @UseGuards(RolesGuard)
 @UseInterceptors(LoggingInterceptor)
 @UseFilters(new HttpExceptionFilter()) // Filter @ controller scope
@@ -35,43 +35,39 @@ export class CatController {
   @Get('name')
   /* @HttpCode(204)
   @Header('Cache-Control', 'none') */
-  @Redirect('/')
+  //@Redirect('/')
   idName(): string {
     return 'anem of cat';
   }
 
   @Get()
-  async findAll(): Promise<ICat[]> {
-    //throw new ForbiddenException();
+  async findAll(): Promise<any> {
     return await this.catService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseIntPipe()) id) {
-    return `This action returns a #${id} cat`;
-  }
-
-  @Get()
-  findUser(@User() user: UserModel) {
-    return `This action returns a #${user}`;
+  async findOne(@Param() params): Promise<string> {
+    return `This action returns a #${params.id} cat`;
   }
 
   @Post('create')
-  @Roles('admin') // use to set setMetaData
+  //@Roles('admin') // use to set setMetaData
   @UsePipes(new ValidationPipe())
-  // filter @ local scope. Dependency Injection will instantiate the class
-  @UseFilters(HttpExceptionFilter)
+  @UseFilters(HttpExceptionFilter)  /** filter @local scope. DInjection will instantiate the class */
   async create(@Body() catObj: CreateCat) {
-    await this.catService.create(catObj);
+    return await this.catService.create(catObj);
   }
 
+  /** update method
+   * @param {string} id - The id of obj in db
+   */
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCat: UpdateCat) {
+  async update(@Param('id') id: string, @Body() updateCat: UpdateCat) {
     return `This action returns a #${id} cat ${updateCat}`;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return `This action removes a #${id} cat`;
   }
 }

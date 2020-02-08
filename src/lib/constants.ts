@@ -3,8 +3,9 @@ export enum Gender {
   female = 'female',
 }
 
-export enum Config {
+export enum CONFIG {
   CONFIG_OPTIONS = 'CONFIG_OPTIONS',
+  MONGODB_URI = 'MONGODB_URI',
 }
 
 export const JWT_OPTIONS = {
