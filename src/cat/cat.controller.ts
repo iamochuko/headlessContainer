@@ -15,15 +15,17 @@ import {
   Paramtype,
 } from '@nestjs/common';
 
-import { UserModel } from '../model/User';
 import { CatService } from './cat.service';
 import { HttpExceptionFilter } from '../Exception/http-exception-filter';
-import { ValidationPipe } from '../pipe/validation.pipe';
 import { RolesGuard } from '../guard/roles.guard';
 import { Roles } from '../decorator/roles.decorator';
 import { LoggingInterceptor } from '../interceptor/logging.interceptor';
 import { User } from '../decorator/user.decorator';
 import { CreateCat, UpdateCat } from '../cat/model/cat';
+import { CatJoiSchema } from '../cat/schema/cat.joi.schema';
+import { JoiValidationPipe } from '../pipe/joi.validation.pipe';
+
+
 
 @Controller('api/cats')
 @UseGuards(RolesGuard)
@@ -52,8 +54,8 @@ export class CatController {
 
   @Post('create')
   //@Roles('admin') // use to set setMetaData
-  @UsePipes(new ValidationPipe())
-  @UseFilters(HttpExceptionFilter)  /** filter @local scope. DInjection will instantiate the class */
+  @UsePipes(new JoiValidationPipe(CatJoiSchema))
+  @UseFilters(HttpExceptionFilter)
   async create(@Body() catObj: CreateCat) {
     return await this.catService.create(catObj);
   }

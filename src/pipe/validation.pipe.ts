@@ -7,6 +7,7 @@ import {
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
+/* Class validator */
 @Injectable()
 export class ValidationPipe implements PipeTransform {
   async transform(value: any, metadata: ArgumentMetadata) {

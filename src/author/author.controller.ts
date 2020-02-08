@@ -1,11 +1,22 @@
-import { Controller, Get } from '@nestjs/common';
-import { UserModel } from 'src/model/User';
-import { User } from 'src/decorator/user.decorator';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 
-@Controller('author')
+import { User } from '../decorator/user.decorator';
+import { UserModel, FindOneParams } from './model/User';
+
+@Controller('api/author')
 export class AuthorController {
   @Get()
   async findUser(@User() user: UserModel) {
     return `This action returns a #${user}`;
+  }
+
+  @Get(':id')
+  findOne(@Param() params: FindOneParams) {
+    return `this para is: ${params.id}`;
+  }
+
+  @Post('create')
+  async createUser(@Body() user: UserModel) {
+    return `this action creates a new user ${user}`;
   }
 }

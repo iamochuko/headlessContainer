@@ -5,16 +5,20 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 
+/* Object schema validation */
 @Injectable()
-export class ValidatePipe
+export class JoiValidationPipe
   implements PipeTransform<{ value: any; metadate: any }> {
   constructor(private readonly schema: Record<string, any>) {}
 
-  transform(value: any, metadata: ArgumentMetadata) {
-    const { err } = this.schema.validate(value);
-    if (err) {
+  async transform(value: any, metadata: ArgumentMetadata) {
+    try {
+      const res = await this.schema.validateAsync(value);
+      if (res.name) {
+        return value;
+      }
+    } catch (err) {
       throw new BadRequestException('Validation failed!');
     }
-    return value;
   }
 }
