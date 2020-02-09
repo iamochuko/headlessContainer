@@ -3,6 +3,8 @@ import {
   NestModule,
   MiddlewareConsumer,
   RequestMethod,
+  CacheModule,
+  CacheInterceptor,
 } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -30,26 +32,28 @@ import { MongooseConfigService } from './lib/mongooseConfig/mongooseconfig.servi
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 5, // secs
+      max: 20, // items to cache
+    }),
     CatModule,
     CustomerModule,
     AuthModule,
     ConfigModule.forRoot({
-      /* envFilePath: '.development.env', */ 
+      /* envFilePath: '.development.env', */
+
       isGlobal: true,
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid(
-          'development',
-          'production',
-          'test',
-          'provision',
-        ).default('development'),
-        PORT: Joi.number().default(5000)
+        NODE_ENV: Joi.string()
+          .valid('development', 'production', 'test', 'provision')
+          .default('development'),
+        PORT: Joi.number().default(5000),
       }),
-      validationOptions:{
+      validationOptions: {
         //allowUnknown: false,
         abortEarly: true,
       },
-      expandVariables:true
+      expandVariables: true,
     }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
@@ -82,6 +86,10 @@ import { MongooseConfigService } from './lib/mongooseConfig/mongooseconfig.servi
     {
       provide: APP_INTERCEPTOR,
       useClass: TimeoutInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
     },
   ],
 })

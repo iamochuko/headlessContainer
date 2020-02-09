@@ -2,6 +2,7 @@ import { Injectable, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserService } from '../user/user.service';
+import { UserEntity } from '../entities/UseEntity';
 
 @Injectable()
 export class AuthService {
@@ -10,12 +11,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pwd: string): Promise<any> {
+  // pass this @UseInterceptors(ClassSerializerInterceptor) to the handler method
+  async validateUser(username: string, pwd: string): Promise<UserEntity> {
     try {
       const user = await this.userService.findOne(username);
       if (user && user.password == pwd) {
-        delete user.password;
-        return user;
+        //delete user.password;
+        return new UserEntity({
+          firstName: user.username,
+          id: user.userId,
+          password: user.password,
+        });
+        //return user;
       } else {
         return null;
       }
@@ -25,7 +32,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-      // jwt 
+    // jwt
     return {
       token: this.jwtService.sign({
         username: user.username,

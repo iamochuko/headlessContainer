@@ -7,6 +7,8 @@ import {
   HttpException,
   ForbiddenException,
   Body,
+  CacheKey,
+  CacheTTL,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -20,6 +22,8 @@ export class AppController {
     private readonly authService: AuthService,
   ) {}
 
+  @CacheKey('appCtrl')
+  @CacheTTL(20)
   @Get()
   getHello(): string {
     return this.appService.getHello();
